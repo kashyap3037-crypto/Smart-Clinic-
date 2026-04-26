@@ -117,7 +117,7 @@ onSnapshot(query(collection(db, "patients"), orderBy("createdAt", "desc")), (sna
                             ${isPriority ? '<small style="color:var(--danger); font-weight:800;">🚨 EMERGENCY</small>' : '<small class="text-muted">Walk-in</small>'}
                         </div>
                     </td>
-                    <td data-label="Doctor">
+                    <td data-label="Assigned Doctor">
                         <span class="badge badge-waiting" style="padding: 6px 14px; border-radius: 10px; font-size: 0.75rem;">
                             DR. ${dr.name.toUpperCase()}
                         </span>
