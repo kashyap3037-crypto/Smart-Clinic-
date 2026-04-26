@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Portal | SmartClinic Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --bg: #f8fafc;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-dark);
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding-bottom: 40px;
+        }
+
+        /* MOBILE HEADER */
+        .portal-nav {
+            background: white;
+            padding: 16px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .portal-nav .logo {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .home-btn {
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 12px;
+            background: #f1f5f9;
+            transition: all 0.3s ease;
+        }
+
+        /* SCROLLABLE NAV BAR - NOW ADAPTED TO FIT ONE LINE */
+        .tab-scroller {
+            background: white;
+            padding: 8px 3%;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            gap: 6px;
+            justify-content: space-between;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column; /* Stack Emoji and Text for vertical efficiency */
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 8px 4px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.7rem; /* Smaller text to guarantee fit */
+            color: var(--text-muted);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 0; /* Allow shrinking */
+            text-align: center;
+        }
+
+        .tab-item span { font-size: 1.2rem; }
+
+        .tab-item.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(14, 165, 233, 0.2);
+        }
+
+        @media (min-width: 400px) {
+            .tab-item { font-size: 0.8rem; flex-direction: row; padding: 10px; }
+            .tab-item span { font-size: 1rem; }
+        }
+
+        /* CONTENT CONTAINER */
+        .container {
+            max-width: 600px;
+            margin: 24px auto;
+            padding: 0 5%;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+            color: var(--text-dark);
+            text-align: left;
+        }
+
+        .card-view {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 14px;
+            border: 2px solid #e2e8f0;
+            font-size: 1rem;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+        }
+
+        .btn-generate {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 8px 16px rgba(14, 165, 233, 0.2);
+        }
+
+        .btn-generate:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px rgba(14, 165, 233, 0.3);
+        }
+
+        /* LIVE STATUS STYLING */
+        .status-hero {
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        .token-display {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            border-radius: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 20px 40px -10px rgba(14, 165, 233, 0.4);
+        }
+
+        .token-display .num { font-size: 4rem; font-weight: 900; }
+        .token-display .label { font-size: 0.75rem; font-weight: 800; letter-spacing: 2px; opacity: 0.8; }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .stat-card .val { font-size: 1.25rem; font-weight: 800; color: var(--text-dark); display: block; }
+        .stat-card .lab { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+
+<body>
+
+    <nav class="portal-nav">
+        <div class="logo">🏥 SmartClinic</div>
+        <a href="index.html" class="home-btn">Home</a>
+    </nav>
+
+    <div class="tab-scroller">
+        <button onclick="switchView('walkin')" id="nav-walkin" class="tab-item active">
+            <span>⚡</span> Digital Token
+        </button>
+        <button onclick="switchView('booking')" id="nav-booking" class="tab-item">
+            <span>📅</span> Appointment
+        </button>
+        <button onclick="switchView('track')" id="nav-track" class="tab-item">
+            <span>🔍</span> Tracker
+        </button>
+    </div>
+
+    <main class="container">
+        
+        <div id="setup-view">
+            <!-- JOIN LIVE QUEUE -->
+            <div id="view-walkin" class="view-group">
+                <h2 class="section-title">Join Live Queue</h2>
+                <div class="card-view">
+                    <form id="form-walkin">
+                        <div class="form-group">
+                            <label>Patient Name</label>
+                            <input type="text" id="w-name" placeholder="Full Name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Assigned Specialist</label>
+                            <select id="w-doctor" required>
+                                <option value="">Select Doctor</option>
+                                <option value="doc1">Dr. Sharma (Cardio)</option>
+                                <option value="doc2">Dr. Patel (Pediatrics)</option>
+                                <option value="doc3">Dr. Khan (Ortho)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-generate">Generate Digital Token</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- APPOINTMENT VIEW -->
+            <div id="view-booking" class="view-group hidden">
+                <h2 class="section-title">Book Appointment</h2>
+                <div class="card-view">
+                    <form id="form-booking">
+                        <div class="form-group"><label>Full Name</label><input type="text" id="b-name" required></div>
+                        <div class="form-group"><label>Specialist</label>
+                            <select id="b-doctor" required>
+                                <option value="doc1">Dr. Sharma</option>
+                                <option value="doc2">Dr. Patel</option>
+                                <option value="doc3">Dr. Khan</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Date & Time</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="date" id="b-date" required>
+                                <input type="time" id="b-time" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-generate">Confirm Schedule</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- TRACKER VIEW -->
+            <div id="view-track" class="view-group hidden">
+                <h2 class="section-title">Track My Token</h2>
+                <div class="card-view">
+                    <div class="form-group">
+                        <label>Token Number</label>
+                        <input type="number" id="t-token" placeholder="e.g. 42">
+                    </div>
+                    <button id="btn-track" class="btn-generate">Monitor Position</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LIVE STATUS VIEW -->
+        <div id="live-view" class="hidden">
+            <h2 class="section-title">Your Live Status</h2>
+            <div class="card-view status-hero">
+                <div class="token-display">
+                    <span class="label">TOKEN</span>
+                    <span class="num" id="l-token">--</span>
+                </div>
+                <h3 id="l-doc" style="margin: 0; font-weight: 800; color: var(--text-dark);">Dr. Sharma</h3>
+                <p id="l-status" style="margin: 10px 0; color: var(--primary); font-weight: 700; font-size: 0.9rem;">CONNECTING...</p>
+
+                <div class="stat-grid">
+                    <div class="stat-card"><span class="lab">Serving</span><span class="val" id="l-serving">#0</span></div>
+                    <div class="stat-card"><span class="lab">Behind</span><span class="val" id="l-pos">0</span></div>
+                    <div class="stat-card"><span class="lab">Wait</span><span class="val" id="l-wait">~</span></div>
+                </div>
+
+                <button id="btn-leave" style="margin-top: 30px; background: #fee2e2; color: #ef4444; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 700; width: 100%;">Leave Queue</button>
+            </div>
+        </div>
+
+    </main>
+
+    <script type="module" src="patient.mjs"></script>
+    <script>
+        function switchView(v) {
+            document.querySelectorAll('.tab-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('nav-' + v).classList.add('active');
+
+            document.querySelectorAll('.view-group').forEach(c => c.classList.add('hidden'));
+            document.getElementById('view-' + v).classList.remove('hidden');
+        }
+    </script>
+</body>
+
+</html>

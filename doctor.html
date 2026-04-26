@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Terminal | SmartClinic Premium</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .doctor-header { 
+            background: linear-gradient(135deg, #0369a1 0%, #075985 100%); 
+            color: white; 
+            padding: 20px 6%; 
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .header-content { display: flex; flex-direction: column; gap: 2px; }
+        .header-content .brand { font-weight: 900; font-size: 0.75rem; opacity: 0.8; letter-spacing: 1px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; }
+        .header-content h1 { font-size: 1.25rem; font-weight: 800; margin: 0; line-height: 1.2; }
+        
+        .logout-btn {
+            background: white;
+            color: #0369a1;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            white-space: nowrap;
+        }
+
+        /* MOBILE OPTIMIZATIONS */
+        @media (max-width: 900px) {
+            .doctor-header { padding: 15px 5%; border-radius: 0 0 20px 20px; }
+            .header-content h1 { font-size: 1.1rem; }
+            .logout-btn { padding: 8px 14px; font-size: 0.8rem; }
+            
+            .dashboard-grid { 
+                grid-template-columns: 1fr !important; 
+                gap: 20px !important; 
+                padding: 0 10px;
+            }
+
+            .card { padding: 30px 20px !important; border-radius: 20px; }
+            .token-case .num { font-size: 4rem !important; }
+            #main-name { font-size: 2.2rem !important; }
+
+            /* Action Buttons Layout */
+            .action-grid {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px !important;
+                margin-top: 30px;
+            }
+            .btn-hero { 
+                grid-column: span 2; 
+                height: 65px !important; 
+                font-size: 1.1rem !important;
+                box-shadow: 0 8px 20px rgba(14, 165, 233, 0.2) !important;
+            }
+            .btn-sub { 
+                height: 55px !important; 
+                font-size: 0.85rem !important; 
+                font-weight: 800 !important;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                border-radius: 14px !important;
+            }
+            .btn-skip-mobile { grid-column: span 2; } /* Make skip full width or centered if needed */
+
+            /* Table to Card Transition */
+            table thead { display: none; }
+            table tr { 
+                display: flex; 
+                flex-direction: column; 
+                background: #f8fafc; 
+                margin-bottom: 12px; 
+                padding: 15px; 
+                border-radius: 16px;
+                border: 1px solid #e2e8f0;
+            }
+            table td { 
+                display: flex; 
+                justify-content: space-between; 
+                padding: 5px 0 !important;
+                border: none !important;
+            }
+            table td::before { 
+                content: attr(data-label); 
+                font-weight: 700; 
+                color: #64748b; 
+                font-size: 0.75rem; 
+                text-transform: uppercase;
+            }
+            
+            .dual-analytics { grid-template-columns: 1fr 1fr !important; }
+        }
+    </style>
+</head>
+<body style="background: #f1f5f9;">
+
+    <div class="doctor-header">
+        <div class="header-content">
+            <div class="brand">🏥 SmartClinic</div>
+            <h1 id="doc-title">Doctor Dashboard</h1>
+        </div>
+
+        <div class="header-actions">
+            <!-- Hidden on mobile CSS, but functional here -->
+            <div class="status-pill">
+                <select id="doc-status-control" style="background: transparent; border: none; color: white; font-weight: 800; font-family: inherit; font-size: 0.9rem; cursor: pointer; outline: none;">
+                    <option value="available" style="color: black;">✅ Available</option>
+                    <option value="busy" style="color: black;">🔴 Busy</option>
+                </select>
+            </div>
+            <a href="index.html" class="logout-btn">🏠 Logout</a>
+        </div>
+    </div>
+
+    <div class="container" style="max-width: 1500px; margin-top: -20px;">
+        <div class="dashboard-grid" style="grid-template-columns: 1fr 420px; gap: 40px;">
+            
+            <!-- LEFT: CONSULTATION ZONE -->
+            <div>
+                <div class="card" style="padding: 50px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.03); border: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: -30px;">
+                        <span class="badge badge-serving" style="padding: 10px 20px; font-size: 0.9rem;">Live Session</span>
+                        <div id="consultation-timer" style="font-family: monospace; font-size: 2rem; font-weight: 800; color: #334155;">00:00</div>
+                    </div>
+
+                    <div class="token-case">
+                        <span>NOW SERVING</span>
+                        <div class="num" id="main-token">#00</div>
+                    </div>
+                    
+                    <h1 id="main-name" style="font-size: 3.2rem; font-weight: 800; margin-bottom: 40px; letter-spacing: -2px;">Ready to Consult</h1>
+                    
+                    <div class="action-grid">
+                        <button id="btn-next" class="btn btn-primary btn-hero">
+                            Next Patient 
+                        </button>
+                        
+                        <button id="btn-complete" class="btn btn-sub" style="background: #ecfdf5; color: #059669; border: 2px solid #d1fae5;">
+                            FINISH
+                        </button>
+
+                        <button id="btn-call" class="btn btn-secondary btn-sub" style="background: #f1f5f9; border: 2px solid #e2e8f0;">
+                            🔔 CALL
+                        </button>
+                        
+                        <button id="btn-skip" class="btn btn-secondary btn-sub btn-skip-mobile" style="background: #fff1f2; border: 2px solid #fee2e2; color: #e11d48;">
+                            ⏩ SKIP PATIENT
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card mt-4" style="padding: 0; overflow: hidden; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.02);">
+                    <div class="card-header" style="padding: 25px; border: none; background: white; margin-bottom: 0;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <h3 style="font-weight: 800;">Lobby Waiting List</h3>
+                        </div>
+                        <span id="wait-time-calc" class="badge badge-waiting">FIFO Active</span>
+                    </div>
+                    <div style="padding: 0 10px 20px 10px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Token</th>
+                                    <th>Patient</th>
+                                    <th>Wait</th>
+                                    <th style="text-align: right;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="queue-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: ANALYTICS & TOOLS -->
+            <div style="display: flex; flex-direction: column; gap: 30px;">
+                <div class="card" style="padding: 25px;">
+                    <h3 style="margin-bottom: 20px;">Session Analytics</h3>
+                    <div class="dual-analytics" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div style="background: #f0fdf4; padding: 25px; border-radius: 20px; text-align: center; border: 1.5px solid #dcfce7;">
+                            <small style="color: #15803d; font-weight: 800; text-transform: uppercase;">Served</small>
+                            <div id="stat-served" style="font-size: 2.8rem; font-weight: 900; color: #166534;">0</div>
+                        </div>
+                        <div style="background: #fff1f2; padding: 25px; border-radius: 20px; text-align: center; border: 1.5px solid #fee2e2;">
+                            <small style="color: #9f1239; font-weight: 800; text-transform: uppercase;">Skipped</small>
+                            <div id="stat-skipped" style="font-size: 2.8rem; font-weight: 900; color: #881337;">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="padding: 25px; background: #0c4a6e; color: white; border: none;">
+                    <h3 style="color: white; margin-bottom: 20px;">Station Configuration</h3>
+                    <div class="form-group">
+                        <label style="color: rgba(255,255,255,0.6);">Average Consultation Time (min)</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="number" id="input-avg-time" value="10" style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.05); color: white;">
+                            <button id="btn-save-settings" class="btn btn-primary" style="height: 55px; padding: 0 20px;">Save</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="padding: 0; overflow: hidden; background: #f8fafc;">
+                    <div class="card-header" style="padding: 25px; border: none; margin-bottom: 0;">
+                        <h3 style="font-weight: 800;">Recent History</h3>
+                    </div>
+                    <div id="doctor-history-list" style="max-height: 480px; overflow-y: auto; padding: 0 15px 20px 15px;">
+                        <p class="text-muted text-center" style="padding: 20px;">Monitoring session data...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION SYSTEM -->
+    <audio id="notif-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+
+    <script type="module" src="doctor.mjs"></script>
+</body>
+</html>

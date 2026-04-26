@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMART CLINIC | LOBBY DISPLAY</title>
+    <!-- Use shared fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            /* Override or extend shared vars for the display screen */
+            --display-hero: #0f172a;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 0; /* Remove body padding for a cleaner edge-to-edge feel */
+        }
+
+        /* TOP BAR */
+        .display-nav {
+            background: var(--display-hero);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .display-nav .logo {
+            color: white; /* Maintain logo visibility on dark nav */
+        }
+
+        .conn-indicator {
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .conn-indicator.active {
+            background: var(--success);
+            color: white;
+        }
+
+        .current-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.2rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* LAYOUT GRID */
+        .display-content {
+            flex: 1;
+            display: grid;
+            grid-template-rows: auto auto 1fr auto;
+            gap: 15px;
+            padding: 15px 30px;
+            overflow: hidden;
+        }
+
+        /* HERO: NOW CALLING */
+        .hero-section {
+            background: white;
+            border-radius: 20px;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            position: relative;
+        }
+
+        .hero-section::before {
+            content: "NOW SERVING";
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 0.7rem;
+            font-weight: 900;
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
+
+        .hero-token-container {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            width: 150px;
+            height: 150px;
+            border-radius: 35px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 20px -5px rgba(14, 165, 233, 0.3);
+        }
+
+        .hero-token-container .label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            opacity: 0.8;
+        }
+
+        .hero-token-container .num {
+            font-size: 5rem;
+            font-weight: 950;
+            line-height: .9;
+        }
+
+        .hero-doc-info {
+            text-align: right;
+        }
+
+        .hero-doc-info .proceed-text {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .hero-doc-info .doc-name {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        /* NEXT QUEUE */
+        .next-list {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+        }
+
+        .next-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border-bottom: 4px solid var(--primary);
+            transition: transform 0.2s;
+        }
+
+        .next-card:hover { transform: translateY(-3px); }
+
+        .next-card .token {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .next-card .doctor {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        /* DOCTORS GRID */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            overflow: hidden;
+        }
+
+        .status-card {
+            background: white;
+            padding: 12px 20px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-card .doc-meta .name {
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        .status-card .doc-meta .info {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .status-card .current-val {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--success);
+            background: #ecfdf5;
+            padding: 4px 12px;
+            border-radius: 10px;
+        }
+
+        .section-header {
+            font-size: 0.9rem;
+            font-weight: 900;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        /* ALERT BAR */
+        .alert-bar {
+            background: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 10px 20px -5px rgba(14, 165, 233, 0.3);
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 rgba(14, 165, 233, 0); }
+            50% { box-shadow: 0 0 25px rgba(14, 165, 233, 0.5); }
+            100% { box-shadow: 0 0 0 rgba(14, 165, 233, 0); }
+        }
+
+        /* BOOTSTRAP OVERLAY */
+        #module-error {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: white;
+            z-index: 9999;
+            padding: 60px;
+            text-align: center;
+        }
+
+        /* MOBILE RESPONSIVE DISPLAY - FIT TO SCREEN */
+        @media (max-width: 900px) {
+            body { height: 100vh; overflow: hidden; margin: 0; padding: 0; }
+            .display-nav { padding: 12px 15px; border-radius: 0; display: flex; justify-content: space-between; align-items: center; }
+            .conn-indicator { display: none; }
+            .current-time { font-size: 1.1rem; }
+            .clinic-info .logo { font-size: 1.25rem; white-space: nowrap; }
+            
+            .display-nav .btn-secondary { 
+                padding: 8px 12px !important; 
+                font-size: 0.7rem !important; 
+                white-space: nowrap;
+                border-radius: 10px !important;
+                margin: 0 10px;
+            }
+            
+            .display-content { 
+                flex: 1;
+                display: flex; 
+                flex-direction: column; 
+                padding: 12px; 
+                gap: 12px;
+                justify-content: flex-start;
+                overflow: hidden;
+            }
+            
+            .hero-section { margin-bottom: 0; }
+
+            .hero-section { 
+                flex-direction: column; 
+                padding: 15px; 
+                gap: 8px;
+                border-radius: 16px;
+            }
+            .hero-section::before { font-size: 0.6rem; top: 8px; left: 15px; }
+            .hero-token-container { width: 90px; height: 90px; border-radius: 20px; }
+            .hero-token-container .num { font-size: 2.8rem; }
+            .hero-doc-info .proceed-text { font-size: 0.8rem; }
+            .hero-doc-info .doc-name { font-size: 1.5rem; }
+
+            .section-header { font-size: 0.65rem; margin-bottom: 5px; letter-spacing: 1px; }
+
+            .next-list { 
+                display: flex; 
+                gap: 8px; 
+                justify-content: space-between;
+            }
+            .next-card { flex: 1; padding: 10px 5px; border-radius: 10px; min-width: 0; }
+            .next-card .token { font-size: 1.2rem; }
+            .next-card .doctor { font-size: 0.5rem; margin-top: 2px; }
+
+            .status-grid { 
+                display: flex;
+                flex-direction: column;
+                gap: 6px; 
+                overflow: hidden;
+            }
+            .status-card { padding: 10px 15px; border-radius: 12px; }
+            .status-card .doc-meta .name { font-size: 0.9rem; }
+            .status-card .doc-meta .info { font-size: 0.65rem; }
+            .status-card .current-val { font-size: 1.1rem; padding: 2px 8px; }
+
+            .alert-bar {
+                margin: 0;
+                font-size: 0.8rem;
+                padding: 10px;
+                border-radius: 10px;
+                animation: none;
+                box-shadow: none;
+            }
+        }
+
+        /* SCROLL CONTROL */
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="module-error">
+        <h1 style="font-size: 4rem; color: var(--danger); margin-bottom: 20px;">System Offline</h1>
+        <p style="font-size: 1.5rem; color: var(--text-muted);">Please start your local server to view the lobby dashboard.</p>
+        <div style="margin-top: 40px; padding: 30px; background: #f1f5f9; border-radius: 20px; display: inline-block; text-align: left;">
+            <code>npx serve .</code> in your project directory.
+        </div>
+    </div>
+
+    <nav class="display-nav">
+        <div class="clinic-info" style="display: flex; align-items: center; gap: 20px;">
+            <div class="logo">🏥 SmartClinic</div>
+            <div id="connection-status" class="conn-indicator">SYNCING...</div>
+        </div>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <a href="index.html" class="btn btn-secondary" style="padding: 10px 20px; font-size: 0.9rem; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.1);">Home Portal</a>
+            <div class="current-time" id="clock">00:00:00</div>
+        </div>
+    </nav>
+
+    <div class="display-content">
+        
+        <!-- ROW 1: NOW CALLING -->
+        <div class="hero-section">
+            <div class="hero-token-container">
+                <div class="label">TOKEN</div>
+                <div class="num" id="hero-token">--</div>
+            </div>
+            <div class="hero-doc-info">
+                <div class="proceed-text">Please Proceed to</div>
+                <div class="doc-name" id="hero-doctor">Connecting...</div>
+            </div>
+        </div>
+
+        <!-- ROW 2: UP NEXT -->
+        <div style="display: flex; flex-direction: column;">
+            <div class="section-header">Upcoming Queue</div>
+            <div class="next-list" id="next-tokens-container">
+                <div class="next-card"><div class="token">--</div><div class="doctor">...</div></div>
+                <div class="next-card"><div class="token">--</div><div class="doctor">...</div></div>
+                <div class="next-card"><div class="token">--</div><div class="doctor">...</div></div>
+                <div class="next-card"><div class="token">--</div><div class="doctor">...</div></div>
+                <div class="next-card"><div class="token">--</div><div class="doctor">...</div></div>
+            </div>
+        </div>
+
+        <!-- ROW 3: DOCTOR STATUS -->
+        <div style="display: flex; flex-direction: column; overflow: hidden;">
+            <div class="section-header">Active Specialists</div>
+            <div class="status-grid" id="doctors-status-container">
+                <!-- Data via display.mjs -->
+            </div>
+        </div>
+
+        <!-- FOOTER ALERT -->
+        <div class="alert-bar" id="bottom-alert-text">
+            TOKEN READY &bull; PLEASE WATCH THE SCREEN
+        </div>
+
+    </div>
+
+    <audio id="alert-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+
+    <script>
+        window.moduleLoaded = false;
+        setTimeout(() => { if (!window.moduleLoaded) document.getElementById('module-error').style.display = 'block'; }, 4000);
+    </script>
+    <script type="module" src="display.mjs"></script>
+    <script>
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', { 
+                hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' 
+            });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+</body>
+</html>

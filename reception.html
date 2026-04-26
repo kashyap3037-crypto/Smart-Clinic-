@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receptionist Dashboard | SmartClinic Premium</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .reception-header { 
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); 
+            color: white; 
+            padding: 30px 5%; 
+            border-radius: 0 0 40px 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .form-sidebar { position: sticky; top: 120px; }
+        .priority-row { background: #fff1f2 !important; border-left: 5px solid var(--danger) !important; }
+        .row-token { font-weight: 900; color: var(--primary); font-size: 1.1rem; }
+        .tab-btn { padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 700; border: none; background: #f1f5f9; color: #64748b; transition: all 0.2s; }
+        .tab-btn.active { background: var(--primary); color: white; }
+
+        .mobile-bottom-nav { display: none; }
+
+        /* MOBILE EXCLUSIVE VIEWS */
+        @media (max-width: 900px) {
+            .navbar { padding: 12px 5% !important; }
+            .reception-header { padding: 40px 6% 30px; margin-bottom: 25px; border-radius: 0 0 30px 30px; }
+            .reception-header h1 { font-size: 1.8rem !important; }
+            .reception-header p { font-size: 0.9rem !important; }
+
+            .dashboard-grid { 
+                grid-template-columns: 1fr !important; 
+                gap: 20px !important; 
+                padding-bottom: 100px; /* Space for bottom nav */
+            }
+            .form-sidebar { position: static; }
+            .card { border-radius: 20px; padding: 20px !important; }
+            
+            table thead { display: none; }
+            table tr { 
+                display: block; 
+                background: white; 
+                margin-bottom: 20px; 
+                border: 1px solid #f1f5f9; 
+                border-radius: 20px;
+                padding: 20px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            }
+            table td { 
+                border: none !important; 
+                padding: 8px 0 !important; 
+                display: flex; 
+                justify-content: space-between; 
+                align-items: center; 
+                font-size: 0.9rem;
+            }
+            table td::before { 
+                content: attr(data-label); 
+                font-weight: 800; 
+                color: #94a3b8; 
+                font-size: 0.75rem; 
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            /* Ensure values stay on the right and align correctly */
+            table td > div, table td > span, table td > small {
+                text-align: right;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+            }
+            table td:last-child { 
+                margin-top: 15px; 
+                border-top: 1px solid #f1f5f9 !important; 
+                padding-top: 15px !important; 
+                justify-content: center; /* Center the action button */
+            }
+            .row-token { color: var(--primary) !important; font-weight: 900; font-size: 1.1rem; }
+
+            .mobile-bottom-nav {
+                display: flex;
+                position: fixed;
+                bottom: 0; left: 0; right: 0;
+                background: white;
+                border-top: 1px solid #e2e8f0;
+                padding: 12px 0;
+                justify-content: space-around;
+                z-index: 2000;
+                box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+            }
+            .nav-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
+                font-size: 0.75rem;
+                font-weight: 700;
+                color: #64748b;
+                text-decoration: none;
+            }
+            .nav-item.active { color: var(--primary); }
+            .nav-item span { font-size: 1.3rem; }
+
+            .dual-tables { grid-template-columns: 1fr !important; }
+        }
+    </style>
+</head>
+<body style="background: #f1f5f9;">
+
+    <nav class="navbar" style="background: white; border: none; position: sticky; top: 0; z-index: 1500;">
+        <div class="logo">🏥 SmartClinic</div>
+        <a href="index.html" class="btn btn-secondary" style="font-size: 0.85rem; padding: 8px 16px;">🏠 Exit</a>
+    </nav>
+
+    <div class="reception-header">
+        <h1 style="font-size: 2.2rem; font-weight: 800;">Reception Hub</h1>
+        <p style="opacity: 0.8; font-size: 1.1rem;">Manage live patient arrivals and scheduling.</p>
+    </div>
+
+    <div class="container" style="max-width: 1500px; margin-top: -20px;">
+        <div class="dashboard-grid" style="display: grid; grid-template-columns: 380px 1fr; gap: 30px;">
+            
+            <!-- NEW ARRIVAL CARD -->
+            <div class="form-sidebar">
+                <div class="card" style="box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: none;">
+                    <div style="display: flex; gap: 10px; margin-bottom: 25px; background: #f8fafc; padding: 5px; border-radius: 16px;">
+                        <button onclick="switchForm('walkin')" id="tab-walkin" class="tab-btn active" style="flex:1">⚡ Walk-in</button>
+                        <button onclick="switchForm('booking')" id="tab-booking" class="tab-btn" style="flex:1">📅 Booking</button>
+                    </div>
+
+                    <div id="form-walkin-area">
+                        <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 20px;">New Arrival</h3>
+                        <form id="reg-form">
+                            <div class="form-group"><label>Patient Name</label><input type="text" id="r-name" placeholder="Enter name" required></div>
+                            <div class="form-group">
+                                <label>Assign Doctor</label>
+                                <select class="r-doctor-select" id="r-doctor" required></select>
+                            </div>
+                            <label style="display: flex; align-items: center; gap: 12px; padding: 15px; background: #fffcf0; border: 1px solid #fef3c7; border-radius: 14px; cursor: pointer;">
+                                <input type="checkbox" id="r-priority" style="width: 20px; height: 20px;">
+                                <span style="font-weight: 700; color: #b45309; font-size: 0.85rem;">🚨 EMERGENCY PRIORITY</span>
+                            </label>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 25px; height: 50px; border-radius: 14px;">Generate Token</button>
+                        </form>
+                    </div>
+
+                    <div id="form-booking-area" class="hidden">
+                        <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 20px;">Schedule Booking</h3>
+                        <form id="book-form">
+                            <div class="form-group"><label>Patient Name</label><input type="text" id="rb-name" required></div>
+                            <div class="form-group"><label>Age</label><input type="number" id="rb-age" required></div>
+                            <div class="form-group">
+                                <label>Specialist</label>
+                                <select class="r-doctor-select" id="rb-doctor" required></select>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div class="form-group"><label>Date</label><input type="date" id="rb-date" required></div>
+                                <div class="form-group"><label>Time</label><input type="time" id="rb-time" required></div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; height: 50px; background: var(--primary); border-radius: 14px;">Confirm Appointment</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUEUE CARD -->
+            <div style="display: flex; flex-direction: column; gap: 25px;">
+                
+                <div class="card" style="padding: 0; overflow: hidden; border: none; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                    <div class="card-header" style="padding: 20px; border: none; margin-bottom: 0;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <h3 style="font-size: 1.25rem; font-weight: 800;">Live Queue</h3>
+                        </div>
+                        <span class="badge badge-serving">Active</span>
+                    </div>
+                    <div style="padding: 0 20px 20px;">
+                        <table id="queue-table">
+                            <thead>
+                                <tr>
+                                    <th>Token</th>
+                                    <th>Patient</th>
+                                    <th>Assigned Doctor</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patient-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- OTHER CARDS -->
+                <div class="dual-tables" style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                    <div class="card">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 15px;">📅 Bookings</h3>
+                        <table style="font-size: 0.85rem;"><tbody id="appointment-table"></tbody></table>
+                    </div>
+                    <div class="card" style="background: #f8fafc;">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 15px;">✅ History</h3>
+                        <table style="font-size: 0.85rem;"><tbody id="completed-table"></tbody></table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div class="mobile-bottom-nav">
+        <a href="index.html" class="nav-item"><span>🏠</span> Home</a>
+        <a href="#" class="nav-item active"><span>📋</span> Queue</a>
+        <a href="#" class="nav-item"><span>👤</span> Profile</a>
+    </div>
+
+    <script type="module" src="reception.mjs"></script>
+    <script>
+        function switchForm(f) {
+            document.getElementById('form-walkin-area').classList.toggle('hidden', f !== 'walkin');
+            document.getElementById('form-booking-area').classList.toggle('hidden', f !== 'booking');
+            document.getElementById('tab-walkin').classList.toggle('active', f === 'walkin');
+            document.getElementById('tab-booking').classList.toggle('active', f === 'booking');
+        }
+    </script>
+</body>
+</html>
