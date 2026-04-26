@@ -2,7 +2,7 @@
 
 **SmartClinic** is a premium, real-time medical queue management solution designed to streamline the patient experience and healthcare workflows. Built with a focus on speed, reliability, and modern aesthetics, it provides a seamless bridge between patients, receptionists, and doctors.
 
-![SmartClinic Dashboard Preview](smart_clinic_dashboard_preview.png)
+
 
 ## ✨ Key Features
 
